@@ -5,3 +5,5 @@
 - takeMoney: api/takeMoney
 - putMoney: api/putMoney
 
+![plot](finaltask_db.png)
+
