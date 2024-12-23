@@ -52,21 +52,6 @@ public class BankController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/api/putMoney/{userId}/{amount}")
-    public ResponseEntity<Map<String, Object>> putMoney(@PathVariable int userId, @PathVariable double amount) {
-        Map<String, Object> response = new HashMap<>();
-        try {
-            accountService.putMoney(userId, amount);
-            response.put("result", 1);
-        }catch (Exception e) {
-            response.put("result", 0);
-            response.put("error", e.getMessage());
-        }
-
-
-
-        return  ResponseEntity.ok(response);
-    }
 
 
 }
