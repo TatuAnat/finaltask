@@ -2,9 +2,11 @@ package org.example.fp.service;
 
 import org.example.fp.entity.Account;
 import org.example.fp.entity.Operation;
+import org.example.fp.entity.Transfer;
 import org.example.fp.enums.OperationType;
 import org.example.fp.repository.AccountRepository;
 import org.example.fp.repository.OperationRepository;
+import org.example.fp.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,9 @@ public class AccountService {
 
     @Autowired
     private OperationRepository operationRepository;
+
+    @Autowired
+    private TransferRepository transferRepository;
 
     public Double getBalance(Integer userId) throws Exception {
 
@@ -86,5 +91,51 @@ public class AccountService {
         } else {
             return operationRepository.findByUserIdAndTimestampBetween(userId, from, to);
         }
+    }
+
+    public Transfer transferMoney(Integer fromUserId, Integer toUserId, Double amount) throws Exception {
+        Account fromUserAccount = accountRepository.findByUserId(fromUserId);
+        Account toUserAccount = accountRepository.findByUserId(toUserId);
+
+        if(fromUserAccount == null || toUserAccount == null){
+            throw new Exception("Account ne naiden");
+        }
+
+        if(fromUserAccount.getBalance() < amount){
+            throw new Exception("nedostatochno sredstv");
+        }
+
+        //Sosdan transfer
+        Transfer transfer = new Transfer();
+        transfer.setFromUserId(fromUserId);
+        transfer.setToUserId(toUserId);
+        transfer.setAmount(amount);
+        transfer.setTimestamp(LocalDateTime.now());
+        transferRepository.save(transfer);
+
+        fromUserAccount.setBalance(fromUserAccount.getBalance() - amount);
+        toUserAccount.setBalance(toUserAccount.getBalance() + amount);
+
+        accountRepository.save(fromUserAccount);
+        accountRepository.save(toUserAccount);
+
+
+        Operation operationFromUser = new Operation();
+        Operation operationToUser = new Operation();
+
+
+        operationFromUser.setUserId(fromUserId);
+        operationFromUser.setAmount(amount);
+        operationFromUser.setType(OperationType.TAKE);
+        operationFromUser.setTimestamp(LocalDateTime.now());
+        operationRepository.save(operationFromUser);
+
+        operationToUser.setUserId(toUserId);
+        operationToUser.setAmount(amount);
+        operationToUser.setType(OperationType.PUT);
+        operationToUser.setTimestamp(LocalDateTime.now());
+        operationRepository.save(operationToUser);
+
+        return transfer;
     }
 }

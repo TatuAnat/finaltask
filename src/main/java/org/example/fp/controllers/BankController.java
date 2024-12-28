@@ -2,6 +2,7 @@ package org.example.fp.controllers;
 
 import org.example.fp.entity.Account;
 import org.example.fp.entity.Operation;
+import org.example.fp.entity.Transfer;
 import org.example.fp.repository.AccountRepository;
 import org.example.fp.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +55,21 @@ public class BankController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/api/putMoney/{userId}/{amount}")
+    public ResponseEntity<Map<String, Object>> putMoney(@PathVariable int userId, @PathVariable double amount) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            accountService.putMoney(userId, amount);
+            response.put("result", 1);
+        } catch (Exception e) {
+            response.put("result", 0);
+            response.put("error", e.getMessage());
+        }
+
+        return ResponseEntity.ok(response);
+    }
+
     //Primer':
     //http://localhost:8080/api/getOperationList/123456?from=2024-01-01T00:00:00&to=2024-12-31T00:00:00
     //http://localhost:8080/api/getOperationList/123456?from=2024-01-01T00:00:00
@@ -90,6 +106,28 @@ public class BankController {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/transferMoney")
+    public ResponseEntity<Map<String, Object>> trasferMoney(
+            @RequestParam(required = false) Integer fromUserId,
+            @RequestParam(required = false) Integer toUserId,
+            @RequestParam(required = false) Double amount) {
+
+        Map<String, Object> response = new HashMap<>();
+
+
+        try{
+            Transfer transfer = accountService.transferMoney(fromUserId, toUserId, amount);
+            response.put("transfer", transfer);
+        }catch (Exception e) {
+            response.put("error", e.getMessage());
+            response.put("result", 0);
+        }
+
+
+        return ResponseEntity.ok(response);
+
     }
 
 }
