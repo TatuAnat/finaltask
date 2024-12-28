@@ -11,11 +11,11 @@ import java.util.List;
 @Repository
 public interface OperationRepository extends JpaRepository<Operation, Integer> {
 
-    List<Operation> findByUserId(Integer userId);  //From == null && To == null
+    List<Operation> findByUserId(Integer userId);  //From == null && To == null Sasha
 
-    List<Operation> findByUserIdAndTimestampBefore(Integer userId, LocalDateTime to); //from == null, to != null
+    List<Operation> findByUserIdAndTimestampBefore(Integer userId, LocalDateTime to); // Sasha from == null, to != null
 
-    List<Operation> findByUserIdAndTimestampAfter(Integer userId, LocalDateTime from); //to == null && from != null
+    List<Operation> findByUserIdAndTimestampAfter(Integer userId, LocalDateTime from); // Sasha to == null && from != null
 
     List<Operation> findByUserIdAndTimestampBetween(Integer userId, LocalDateTime from, LocalDateTime to);
 }
